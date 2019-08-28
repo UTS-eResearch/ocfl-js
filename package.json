@@ -24,7 +24,7 @@
     "pairtree": "0.0.1",
     "through2": "^3.0.0",
     "uuid": "^3.3.2",
-    "uuidv4": "^4.0.0"
+    "uuidv4": "^5.0.0"
   },
   "devDependencies": {
     "esm": "^3.2.22",
