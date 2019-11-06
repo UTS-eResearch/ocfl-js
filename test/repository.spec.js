@@ -100,7 +100,7 @@ describe("Successful repository creation", function() {
   it("should have a namaste file", async function() {
     const repository = await createTestRepo();
     assert.strictEqual(
-      fs.existsSync(path.join(repositoryPath, "0=ocfl_object_" + ocflVersion)),
+      fs.existsSync(path.join(repositoryPath, "0=ocfl_" + ocflVersion)),
       true
     );
   });
