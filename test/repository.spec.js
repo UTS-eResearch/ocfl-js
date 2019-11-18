@@ -337,6 +337,20 @@ describe('Adding objects with callbacks', async function () {
     assert.strictEqual(inventory.head, 'v1');
   });
 
+  it('Can fetch an object', async function () {
+    const repository = await createTestRepo();
+    await repository.createNewObjectContent("xx", makeContent);
+    const object = await repository.getObject("xx");
+    const inventory = await object.getInventory();
+    assert.strictEqual(inventory.head, 'v1');
+  });
+
+  it('Can not fetch an object that does not exist', async function () {
+    const repository = await createTestRepo();
+    const object = await repository.getObject("xx");
+    assert.strictEqual(object, null);
+  });
+
   it('Does not let you use a subset of an existing id', async function () {
     const repository = await createTestRepo();
     await repository.createNewObjectContent("aaaa", makeContent);
