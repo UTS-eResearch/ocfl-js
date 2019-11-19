@@ -197,15 +197,32 @@ describe("Adding objects from directories", function() {
   // TODO: break this into smaller it()s and fix the 211 magic number bug
 
   it("should handle file additions and export", async function() {
-    // TODO this depends on tests above running - fix that!
-    const repository = new Repository();
-    await repository.load(repositoryPath);
+    this.timeout(10000);
 
+    const repository = await createTestRepo();
+    await repository.importNewObjectDir("1", sourcePath1);
+    await repository.importNewObjectDir("2", sourcePath1);
+    await repository.importNewObjectDir("3", sourcePath1);
+    var objects = await repository.objects();
+    // Three objects so far
+    assert.strictEqual(objects.length, 3);
+    
     fs.removeSync(sourcePath1_additional_files);
     fs.copySync(sourcePath1, sourcePath1_additional_files);
     // Add some identical additional files
 
-    // Add some new additional files
+    
+
+    // ADD  a fourth opbject
+    const test_id = "id";
+    const object4 = await repository.importNewObjectDir(test_id, sourcePath1);
+    const inv4 = await object4.getInventory();
+    assert.strictEqual(Object.keys(inv4.manifest).length, 209);  
+
+    var objects = await repository.objects();
+    assert.strictEqual(objects.length, 4);
+
+    // Add some new additional files to source path1
     fs.writeFileSync(
       path.join(sourcePath1_additional_files, "sample", "file1.txt"),
       "$T)(*SKGJKVJS DFKJs"
@@ -215,27 +232,28 @@ describe("Adding objects from directories", function() {
       "$T)(*SKGJKdfsfVJS DFKJs"
     );
 
-    const test_id = "id";
-    await repository.importNewObjectDir(test_id, sourcePath1);
+    // And re-import
     const obj = await repository.importNewObjectDir(
       test_id,
       sourcePath1_additional_files
     );
-
     const inv3 = await obj.getInventory();
     const new_id = inv3.id;
     assert.strictEqual(new_id, test_id);
-    // Check  that the object is there
+
+    assert.strictEqual(Object.keys(inv3.manifest).length, 211);  
+
+    // Check  that the object is actuall there on disk
     const objectPath = path.join(
       repositoryPath,
       new_id.replace(/(..)/g, "$1/")
     );
     assert.strictEqual(fs.existsSync(objectPath), true);
+
     // Check that it's v2
     const object = new OcflObject();
     await object.load(objectPath);
     const inv = await object.getInventory();
-
     assert.strictEqual(inv.versions["v2"].state[repeatedFileHash].length, 4);
     assert.strictEqual(
       inv.versions["v2"].state[repeatedFileHash].indexOf(
@@ -243,6 +261,8 @@ describe("Adding objects from directories", function() {
       ) > -1,
       true
     );
+    assert.strictEqual(Object.keys(inv.manifest).length, 211);  
+
 
     // Now delete some stuff
     await fs.remove(path.join(sourcePath1_additional_files, "sample", "pics"));
@@ -252,7 +272,7 @@ describe("Adding objects from directories", function() {
     // Re-initialize exsiting object
     const inv1 = await object.getInventory();
     //
-    assert.strictEqual(Object.keys(inv1.manifest).length, 207);
+    assert.strictEqual(Object.keys(inv1.manifest).length, 211);
     assert.strictEqual(inv1.manifest[sepiaPicHash][0], sepiaPicPath);
     // Sepia pic is v2
     assert.strictEqual(
@@ -270,7 +290,7 @@ describe("Adding objects from directories", function() {
     await repository.importNewObjectDir(test_id, sourcePath1_additional_files);
 
     const inv2 = await object.getInventory();
-    assert.strictEqual(Object.keys(inv1.manifest).length, 207);
+    assert.strictEqual(Object.keys(inv1.manifest).length, 211);
     assert.strictEqual(inv2.manifest[sepiaPicHash][0], sepiaPicPath);
     // Sepia pic is v2
     assert.strictEqual(
@@ -372,6 +392,7 @@ describe("Adding objects from directories", function() {
         "Refuses to export non existent version"
       );
     }
+   
   });
 });
 
