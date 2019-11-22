@@ -4,7 +4,7 @@
   "description": "Oxford Common File Layout",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --require esm"
+    "test": "./node_modules/.bin/mocha --require esm"
   },
   "keywords": [
     "ocfl",
