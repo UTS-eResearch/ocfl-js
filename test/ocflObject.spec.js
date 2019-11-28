@@ -292,7 +292,9 @@ describe('object with content added by a callback', async function () {
     //fs.removeSync(objectPath);
     await fs.remove(objectPath1);
   });
-  
+
+
+
 
 });
 
