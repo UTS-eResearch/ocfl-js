@@ -57,6 +57,26 @@ describe("Testing object creation functionality", async () => {
       );
     }
   });
+  it(`should be able to create an object given a path`, async () => {
+    const objectPath = "/xx/yy/zz";
+    object = new OcflObject({ ocflRoot, objectPath });
+    await object.update({ source });
+    await object.load();
+    const inventory = await object.getLatestInventory();
+    expect(inventory.id).to.equal(objectPath);
+  });
+  it(`should be able to load an object from a path`, async () => {
+    const id = "xxyyzz";
+    object = new OcflObject({ ocflRoot, id });
+    await object.update({ source });
+    await object.load();
+    const inventory = await object.getLatestInventory();
+    expect(inventory.manifest).to.deep.equal({
+      "31bca02094eb78126a517b206a88c73cfa9ec6f704c7030d18212cace820f025f00bf0ea68dbf3f3a5436ca63b53bf7bf80ad8d5de7d8359d0b7fed9dbc3ab99": [
+        "v1/content/sample/file_0.txt"
+      ]
+    });
+  });
   it("should be able to create an object with two versions by adding a file", async () => {
     await object.update({ source });
 
