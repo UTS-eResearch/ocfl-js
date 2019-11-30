@@ -12,13 +12,6 @@ const chai = require("chai");
 const expect = chai.expect;
 chai.use(require("chai-fs"));
 
-// function createDirectory(aPath) {
-//   if (fs.existsSync(aPath)) {
-//     fs.removeSync(aPath);
-//   }
-//   fs.mkdirSync(aPath);
-// }
-
 describe("Testing object creation functionality", async () => {
   let object;
   const ocflRoot = "test-output";
@@ -64,6 +57,21 @@ describe("Testing object creation functionality", async () => {
     await object.load();
     const inventory = await object.getLatestInventory();
     expect(inventory.id).to.equal(objectPath);
+  });
+  it(`should fail to create an object as a child of another`, async () => {
+    let objectPath = "/xx/yy";
+    object = new OcflObject({ ocflRoot, objectPath });
+    await object.update({ source });
+
+    objectPath = "/xx/yy/zz";
+    object = new OcflObject({ ocflRoot, objectPath });
+    try {
+      await object.update({ source });
+    } catch (error) {
+      expect(error.message).to.equal(
+        `This object is a child of an existing object and that's not allowed.`
+      );
+    }
   });
   it(`should be able to load an object from a path`, async () => {
     const id = "xxyyzz";
@@ -551,6 +559,13 @@ describe("Testing object manipulation functionality - object with three versions
     });
   });
 });
+
+// function createDirectory(aPath) {
+//   if (fs.existsSync(aPath)) {
+//     fs.removeSync(aPath);
+//   }
+//   fs.mkdirSync(aPath);
+// }
 
 // describe.skip("object init", function() {
 //   describe("no dir", function() {
