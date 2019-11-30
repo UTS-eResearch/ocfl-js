@@ -20,10 +20,12 @@ chai.use(require("chai-fs"));
 // }
 
 describe("Testing object creation functionality", async () => {
-  let object, source;
+  let object;
+  const ocflRoot = "test-output";
+  const id = "1";
+  const source = "./test-data/simple-ocfl-object";
   beforeEach(async () => {
-    source = "./test-data/simple-ocfl-object";
-    object = new OcflObject({ ocflRoot: "test-output", id: "1" });
+    object = new OcflObject({ ocflRoot, id });
   });
 
   afterEach(async () => {
@@ -44,6 +46,16 @@ describe("Testing object creation functionality", async () => {
         "v1/content/sample/file_0.txt"
       ]
     });
+  });
+  it(`should fail to create an object because there's already one in deposit`, async () => {
+    await fs.mkdirp(path.join(ocflRoot, "deposit", id));
+    try {
+      await object.update({ source });
+    } catch (error) {
+      expect(error.message).to.equal(
+        "An object with that ID is already in the deposit path."
+      );
+    }
   });
   it("should be able to create an object with two versions by adding a file", async () => {
     await object.update({ source });
