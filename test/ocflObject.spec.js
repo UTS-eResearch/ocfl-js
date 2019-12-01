@@ -268,6 +268,87 @@ describe("Testing object creation functionality", async () => {
       );
     }
   });
+  it(`should not be able to export - target folder doesn't exist`, async () => {
+    // v1 create object and import folder
+    await object.update({ source });
+    try {
+      await object.export({ target: "./notfolder" });
+    } catch (error) {
+      expect(error.message).to.equal(`Export target folder doesn't exist.`);
+    }
+  });
+  it(`should not be able to export - target folder empty`, async () => {
+    // v1 create object and import folder
+    await object.update({ source });
+    try {
+      await object.export({ target: "./test-data" });
+    } catch (error) {
+      expect(error.message).to.equal(`Export target folder isn't empty.`);
+    }
+  });
+  it("should be able to export an object with one version - automatically select head", async () => {
+    const exportFolder = "./test-export";
+    await object.update({ source });
+    await fs.mkdirp(exportFolder);
+    await object.export({ target: "./test-export" });
+    let content = await fs.readdir(exportFolder);
+    expect(content).to.deep.equal(["sample"]);
+    content = await fs.readdir(path.join(exportFolder, "sample"));
+    expect(content).to.deep.equal(["file_0.txt"]);
+    await fs.remove(exportFolder);
+  });
+  it("should be able to export an object with one version - select v1", async () => {
+    const exportFolder = "./test-export";
+    await object.update({ source });
+    await fs.mkdirp(exportFolder);
+    await object.export({ target: "./test-export", version: "v1" });
+
+    let content = await fs.readdir(exportFolder);
+    expect(content).to.deep.equal(["sample"]);
+    content = await fs.readdir(path.join(exportFolder, "sample"));
+    expect(content).to.deep.equal(["file_0.txt"]);
+    await fs.remove(exportFolder);
+  });
+  it("should be able to export a version from an object with two versions - select v1", async () => {
+    const exportFolder = "./test-export";
+
+    // v1
+    await object.update({ source });
+
+    // v2 add a file
+    fs.writeFileSync(path.join(source, "file1.txt"), "$T)(*SKGJKVJS DFKJs");
+    await object.update({ source });
+
+    // export
+    await fs.mkdirp(exportFolder);
+    await object.export({ target: "./test-export", version: "v1" });
+
+    let content = await fs.readdir(exportFolder);
+    expect(content).to.deep.equal(["sample"]);
+    content = await fs.readdir(path.join(exportFolder, "sample"));
+    expect(content).to.deep.equal(["file_0.txt"]);
+    await fs.remove(exportFolder);
+  });
+  it("should be able to export a version from an object with two versions - select v2", async () => {
+    const exportFolder = "./test-export";
+
+    // v1
+    await object.update({ source });
+
+    // v2 add a file
+    fs.writeFileSync(path.join(source, "file1.txt"), "$T)(*SKGJKVJS DFKJs");
+    await object.update({ source });
+
+    // export
+    await fs.mkdirp(exportFolder);
+    await object.export({ target: "./test-export", version: "v2" });
+
+    let content = await fs.readdir(exportFolder);
+    expect(content).to.deep.equal(["file1.txt", "sample"]);
+    content = await fs.readdir(path.join(exportFolder, "sample"));
+    expect(content).to.deep.equal(["file_0.txt"]);
+    await fs.remove(exportFolder);
+  });
 
   async function writeContent({ target }) {
     const CONTENT = {
