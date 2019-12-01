@@ -23,7 +23,7 @@ describe("Repository initialisation", () => {
   });
 
   it(`should be able to create a repository`, async () => {
-    if (!fs.existsSync(ocflRoot)) await fs.mkdirp(ocflRoot);
+    if (!(await fs.exists(ocflRoot))) await fs.mkdirp(ocflRoot);
     repository = new Repository({ ocflRoot });
     expect(repository.ocflRoot).to.equal(ocflRoot);
 
