@@ -502,6 +502,17 @@ describe("Testing object manipulation functionality - object with one version", 
     isAvailable = await object.isAvailable();
     expect(isAvailable).to.be.true;
   });
+  it(`should be able to resolve a file path relative to the object`, async () => {
+    // v1 create object and import folder
+    await object.update({ source });
+    await object.load();
+
+    let version = await object.getLatestVersion();
+
+    let file = version.state["file_0.txt"].pop();
+    file = object.resolveFilePath({ filePath: file.path });
+    expect(file).to.equal("test-output/2/v1/content/sample/file_0.txt");
+  });
 });
 
 describe("Testing object manipulation functionality - object with three versions", async () => {
