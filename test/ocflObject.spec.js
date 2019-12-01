@@ -107,18 +107,19 @@ describe("Testing object creation functionality", async () => {
   });
   it("should be able to create an object with three versions by adding another file", async () => {
     // v1
-    await object.update({ source });
+    let result;
+    object = await object.update({ source });
 
     // v2 add a file
     fs.writeFileSync(path.join(source, "file1.txt"), "$T)(*SKGJKVJS DFKJs");
-    await object.update({ source });
+    object = await object.update({ source });
 
     // v3 add another file
     fs.writeFileSync(
       path.join(source, "file2.txt"),
       "fsf v$T)(*SKGJKVJS DFKJs"
     );
-    await object.update({ source });
+    object = await object.update({ source });
 
     let inventory = await object.getLatestInventory();
     // console.log(inventory);
