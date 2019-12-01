@@ -112,6 +112,10 @@ repository.on("object", object=> {
 
 ## OCFL Object
 
+General note: `update` will load the object and latest version state and return that
+on successful update so you will automatically have the current internal file state
+available.
+
 ### Create an object with an ID - ingest a folder
 
 ```
