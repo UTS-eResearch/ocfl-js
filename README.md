@@ -103,8 +103,9 @@ repository = new Repository({ ocflRoot: 'some path' });
  repository.findObjects({});
 
 // register with the 'object' event
-repository.emitter.on("object", objectPath => {
-	console.log(objectPath)
+repository.on("object", object=> {
+	console.log(object)
+	// returns an object that can be used in the constructor for OcflObject
 });
 ```
 

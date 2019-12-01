@@ -80,8 +80,10 @@ describe("Repository initialisation", () => {
     await object.update({ source: "./test-data/simple-ocfl-object" });
 
     repository.findObjects({});
-    repository.emitter.on("object", object => {
-      expect(object.match("/xx/1")[0]).to.equal("/xx/1");
+    repository.on("object", object => {
+      expect(object.objectPath).to.equal("/xx/1");
+      object = new OcflObject(object);
+      expect(object.id).to.equal("/xx/1");
     });
   });
   it(`should find 3 objects in the repository - THIS IS AN EMITTER`, async () => {
@@ -100,7 +102,7 @@ describe("Repository initialisation", () => {
 
     repository.findObjects({});
     let objects = [];
-    repository.emitter.on("object", object => objects.push(object));
+    repository.on("object", object => objects.push(object));
     setTimeout(() => {
       expect(objects.length).to.equal(3);
     }, 200);
