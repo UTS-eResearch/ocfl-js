@@ -18,6 +18,7 @@
 		- [Load an object and getLatestInventory](#load-an-object-and-getlatestinventory)
 		- [Get object versions](#get-object-versions)
 		- [Load object and get information from it](#load-object-and-get-information-from-it)
+		- [Resolve file path relative to object root](#resolve-file-path-relative-to-object-root)
 		- [Export an object](#export-an-object)
 		- [Remove an object](#remove-an-object)
 
@@ -219,6 +220,18 @@ let r = await object.getVersion({version: 'v2'})
 
 // load all version states in one hit - COULD BE VERY EXPENSIVE
 await object.getAllVersions()
+```
+
+### Resolve file path relative to object root
+
+```
+// define the object
+let object = new OcflObject({ ocflRoot: 'some-path', id: 'some-id });
+
+// resolve a path relative to the object root
+file = object.resolveFilePath({ filePath: 'relative/path/to/file})
+
+// returns a full path to the object relative to ocflRoot
 ```
 
 ### Export an object
