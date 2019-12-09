@@ -138,8 +138,6 @@ describe("Additive merging of new content", function() {
 
     const state = inv2['versions'][v]['state'];
 
-    console.log(JSON.stringify(state));
-
     // const inv_files = Object.keys(state).map((h) => state[h][0]);
     // const filenames = files.map((f) => f[0]);
 
