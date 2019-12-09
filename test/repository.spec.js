@@ -1,4 +1,4 @@
-afteconst assert = require("assert");
+const assert = require("assert");
 const path = require("path");
 const fs = require("fs-extra");
 const uuidv4 = require("uuidv4");
