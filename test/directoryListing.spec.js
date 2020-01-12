@@ -1,6 +1,8 @@
 const assert = require("assert");
 const path = require("path");
 const fs = require("fs-extra");
+
+const trees = require('./trees.js');
 const Repository = require("../lib/repository");
 const OcflObject = require("../lib/ocflObject");
 
@@ -33,50 +35,6 @@ async function createTestRepo() {
 
 
 
-function randomWord(chars, length) {
-  var w = '';
-  for( var i = 0; i < length; i++ ) {
-    w += String.fromCharCode(97 + Math.floor(chars * Math.random()))
-  }
-  return w;
-}
-
-async function randomTree(chars, length, bail, width, depth) {
-  const n = {};
-  for( var i = 0; i < width; i++ ) {
-    const w = randomWord(chars, length);
-    if( !n[w] ) {
-      const bailout = Math.random();
-      if( bailout > bail && depth > 0 ) {
-        n[w] = await randomTree(chars, length, bail, width, depth - 1);
-      } else {
-        n[w + '.txt'] = 1;
-      }
-    }
-  }
-  return n;
-}
-
-async function addFile(dir, filename, contents) {
-  const filep = path.join(dir, filename);
-  await fs.writeFile(filep, contents);
-}
-
-async function writeTree(tree, dir) {
-  const items = Object.keys(tree);
-  for( var i = 0; i < items.length; i++ ) {
-    const item = items[i]
-    if( typeof(tree[item]) === 'object' ) {
-      const subdir = path.join(dir, item);
-      await fs.ensureDir(subdir);
-      //console.log(`Wrote dir ${subdir}`);
-      writeTree(tree[item], subdir);
-    } else {
-      await addFile(dir, item, item);
-      //console.log(`Wrote file ${dir}/${item}`);
-    }
-  }
-}
 
 // returns one path through a tree to depth n
 // as a string delimited by forward slashes
@@ -151,11 +109,11 @@ describe("Get a directory listing from an inventory", function() {
     for( var r = 0; r < NRUNS; r++ ) {
       await fs.remove(repositoryPath);
       const repo = await createTestRepo();
-      const tree = await randomTree(6, 3, 0.2, 3, 4);
+      const tree = await trees.randomTree(6, 3, 0.2, 3, 4);
       const oid = 'object';
 
       const obj = await repo.createNewObjectContent(oid, async (dir) => {
-        await writeTree(tree, dir);
+        await trees.writeTree(tree, dir);
         console.log("At end of writeTree");
       });
       console.log("Reading inventory");
