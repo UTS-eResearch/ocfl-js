@@ -12,6 +12,8 @@ function randomWord(chars, length) {
   return w;
 }
 
+// TODO: useful set of default values
+
 async function randomTree(chars, length, bail, width, depth) {
   const n = {};
   for( var i = 0; i < width; i++ ) {
@@ -52,7 +54,26 @@ async function writeTree(tree, dir) {
 }
 
 
+// returns one path through a tree to depth n
+// as a string delimited by forward slashes
+
+function getRandomPathFromTree(tree, n) {
+  if( n > 0 && typeof(tree) === 'object' ) {
+    const items = Object.keys(tree).filter((i) => {
+      return typeof(tree[i]) === 'object'
+    });
+    if( items.length > 0 ) {
+      const item = items[Math.floor(Math.random() * items.length)];
+      return item + '/' + getRandomPathFromTree(tree[item], n - 1);
+    }
+  }
+  return '';
+}
+
+
+
 module.exports = {
   randomTree: randomTree,
-  writeTree: writeTree
+  writeTree: writeTree,
+  getRandomPathFromTree: getRandomPathFromTree
 }

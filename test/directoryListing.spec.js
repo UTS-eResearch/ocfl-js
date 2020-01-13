@@ -25,21 +25,6 @@ const repositoryPath = path.join(process.cwd(), "./test-data/directory_repo");
 
 
 
-// returns one path through a tree to depth n
-// as a string delimited by forward slashes
-
-function getRandomPathFromTree(tree, n) {
-  if( n > 0 && typeof(tree) === 'object' ) {
-    const items = Object.keys(tree).filter((i) => {
-      return typeof(tree[i]) === 'object'
-    });
-    if( items.length > 0 ) {
-      const item = items[Math.floor(Math.random() * items.length)];
-      return item + '/' + getRandomPathFromTree(tree[item], n - 1);
-    }
-  }
-  return '';
-}
 
 
 function getContents(tree, array) {
@@ -113,7 +98,7 @@ describe("Get a directory listing from an inventory", function() {
       const state = inv['versions']['v1']['state'];
 
       for( var i = 0; i < NPATHS; i++ ) {
-        const treepath = getRandomPathFromTree(tree, 2);
+        const treepath = trees.getRandomPathFromTree(tree, 2);
         console.log("Path: " + treepath);
         const patharray = treepath.split('/');
         patharray.pop();
