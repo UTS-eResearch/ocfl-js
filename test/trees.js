@@ -1,7 +1,6 @@
 // utilities for creating random trees and writing them out as directories
 
 const path = require("path");
-
 const fs = require("fs-extra");
 
 

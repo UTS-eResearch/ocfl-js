@@ -3,6 +3,8 @@ const path = require("path");
 const fs = require("fs-extra");
 
 const trees = require('./trees.js');
+const utils = require('./repoUtils.js');
+
 const Repository = require("../lib/repository");
 const OcflObject = require("../lib/ocflObject");
 
@@ -16,22 +18,9 @@ const NRUNS = 20;
 const NPATHS = 20;
 
 
-function createDirectory(aPath) {
-  if (!fs.existsSync(aPath)) {
-    fs.mkdirSync(aPath);
-  }
-}
 
 const repositoryPath = path.join(process.cwd(), "./test-data/directory_repo");
 
-
-async function createTestRepo() {
-  fs.removeSync(repositoryPath);
-  createDirectory(repositoryPath);
-  const repository = new Repository();
-  const init = await repository.create(repositoryPath);
-  return repository;
-}
 
 
 
@@ -108,7 +97,7 @@ describe("Get a directory listing from an inventory", function() {
 
     for( var r = 0; r < NRUNS; r++ ) {
       await fs.remove(repositoryPath);
-      const repo = await createTestRepo();
+      const repo = await utils.createTestRepo(repositoryPath);
       const tree = await trees.randomTree(6, 3, 0.2, 3, 4);
       const oid = 'object';
 
