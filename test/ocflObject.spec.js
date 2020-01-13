@@ -278,7 +278,7 @@ describe("Testing object creation functionality", async () => {
       expect(error.message).to.equal(`Export target folder doesn't exist.`);
     }
   });
-  it(`should not be able to export - target folder empty`, async () => {
+  it(`should not be able to export - target folder not empty`, async () => {
     // v1 create object and import folder
     await object.update({ source });
     try {
