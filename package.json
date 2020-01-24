@@ -1,6 +1,6 @@
 {
   "name": "ocfl",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Oxford Common File Layout",
   "main": "index.js",
   "scripts": {
