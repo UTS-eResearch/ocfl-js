@@ -102,7 +102,7 @@ describe("Additive merging of new content", function() {
 
   });
 
-  it("can add existing files to existing content using additive merge", async function() {
+  it.skip("can add existing files to existing content using additive merge", async function() {
     const files = [];
 
     const repo = await createTestRepo();
@@ -138,20 +138,19 @@ describe("Additive merging of new content", function() {
 
     const state = inv2['versions'][v]['state'];
 
-    console.log(JSON.stringify(state));
+ 
+    const inv_files = Object.keys(state).map((h) => state[h][0]);
+    const filenames = files.map((f) => f[0]);
 
-    // const inv_files = Object.keys(state).map((h) => state[h][0]);
-    // const filenames = files.map((f) => f[0]);
-
-    // expect(inv_files).to.have.members(filenames);
+    expect(inv_files).to.have.members(filenames);
 
     await fs.ensureDir(exportPath);
     await repo.export(oid, exportPath);
 
-    // files.forEach((f) => {
-    //   const fpath = path.join(exportPath, f[0]);
-    //   expect(fpath).to.be.a.file(`${fpath} is a file`).with.content(f[1]);
-    // })
+    files.forEach((f) => {
+      const fpath = path.join(exportPath, f[0]);
+      expect(fpath).to.be.a.file(`${fpath} is a file`).with.content(f[1]);
+    })
 
 
   });
