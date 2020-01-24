@@ -38,12 +38,13 @@ async function addFile(base, dir, filename, contents) {
 }
 
 
-async function addFiles(base, a, b) {
+async function addFiles(base, a, b, content_base) {
+  const c = content_base || 'content ';
   files = [];
   for( var i = a; i <= b; i++ ) {
     const sd = `subdir${i}`;
     const file = 'file.txt';
-    const content = 'content ' + i;
+    const content = c + i;
     const fn = await addFile(base, sd, file, content);
     files.push([path.join(sd, file), content]);
   }
@@ -153,6 +154,67 @@ describe("Additive merging of new content", function() {
     })
 
   });
+
+
+
+  it("can update files using additive merge", async function() {
+    const files = [];
+
+    const filev = {};
+
+    const repo = await createTestRepo();
+    const obj = await repo.createNewObjectContent(null, async (dir) => {
+      const files1 = await addFiles(dir, 0, 19, 'version1');
+      files.push(...files1);
+    });
+
+    for( let i = 0; i < 20; i++ ) {
+      filev[i] = 'v1';
+    }
+
+    const inv = await obj.getInventory();
+    expect(inv).to.not.be.empty;
+    const oid = inv.id;
+    expect(oid).to.not.be.null;
+
+    // do an additive update of two files with the same
+    // path but different content (so different hashes)
+
+    await repo.createNewObjectContent(oid, async (dir) => {
+      await addFiles(dir, 0, 9, 'version2');
+    }, true); 
+
+    for( let i = 0; i < 10; i++ ) {
+      filev[i] = 'v2';
+    }
+
+    const obj2 = await repo.getObject(oid);
+    const inv2 = await obj2.getInventory();
+    const v = inv2.head;
+    expect(v).to.equal('v2');
+
+    // because we updated the files, the length of the manifest in 
+    // v2 state shouldn't have changed
+
+    const state = inv2['versions'][v]['state'];
+
+    expect(Object.keys(state).length).to.equal(files.length);
+
+    // look up each file in v2 state and check that it points to the
+    // correct version in the manifest
+
+    for( var i = 0; i < 20; i++ ) {
+      const file = `subdir${i}/file.txt`;
+      const hashes = Object.keys(state).filter((h) => state[h].includes(file));
+      expect(hashes).to.be.an('array');
+      expect(hashes).to.have.lengthOf(1);
+      const target = inv2['manifest'][hashes[0]][0];
+      expect(target).to.equal(filev[i] + '/content/' + file);
+    }
+
+  });
+
+
 
 
 
