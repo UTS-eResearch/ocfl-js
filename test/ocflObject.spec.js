@@ -11,6 +11,7 @@ const chai = require('chai');
 const expect = chai.expect;
 chai.use(require('chai-fs'));
 
+const fileUtils = require('./fileUtils');
 
 
 function createDirectory(aPath) {
@@ -162,9 +163,11 @@ describe('object with content imported from an existing directory', async functi
   // either the magic number here is wrong or there are some missing files in the
   // test fixture
 
-  it.skip(`should have a manifest (inventory) with 209 items in it`, async function () {
-      const inv = await JSON.parse(fs.readFile(inventoryPath1));
-      assert.strictEqual(Object.keys(inv.manifest).length, 209);
+  it(`should have an inventory with manifest containing all unique input files`, async function () {
+      const inv = await fs.readJSON(inventoryPath1);
+      const uniqueInputs = await fileUtils.collectUniqueFiles(sourcePath1);
+      expect(Object.keys(inv['manifest'])).to.have.members(Object.keys(uniqueInputs));
+      //assert.strictEqual(Object.keys(inv.manifest).length, 209);
   });
 
 

@@ -7,6 +7,8 @@ const hasha = require("hasha");
 const Repository = require("../lib/repository");
 const OcflObject = require("../lib/ocflObject");
 
+const fileUtils = require('./fileUtils');
+
 const chai = require("chai");
 
 const expect = chai.expect;
@@ -32,6 +34,7 @@ async function createTestRepo() {
   const init = await repository.create(repositoryPath);
   return repository;
 }
+
 
 describe("repository initialisation", function() {
   it("should not initialise previous created or loaded repositories", async function() {
@@ -217,7 +220,10 @@ describe("Adding objects from directories", function() {
     const test_id = "id";
     const object4 = await repository.importNewObjectDir(test_id, sourcePath1);
     const inv4 = await object4.getInventory();
-    assert.strictEqual(Object.keys(inv4.manifest).length, 209);  
+    const uniqueFiles = await fileUtils.collectUniqueFiles(sourcePath1);
+
+    expect(Object.keys(inv4.manifest)).to.have.members(Object.keys(uniqueFiles));
+
 
     var objects = await repository.objects();
     assert.strictEqual(objects.length, 4);
@@ -241,7 +247,10 @@ describe("Adding objects from directories", function() {
     const new_id = inv3.id;
     assert.strictEqual(new_id, test_id);
 
-    assert.strictEqual(Object.keys(inv3.manifest).length, 211);  
+    const uniqueFiles_additional = await fileUtils.collectUniqueFiles(sourcePath1_additional_files);
+
+    expect(Object.keys(inv3.manifest)).to.have.members(Object.keys(uniqueFiles_additional));
+
 
     // Check  that the object is actuall there on disk
     const objectPath = path.join(
@@ -261,18 +270,25 @@ describe("Adding objects from directories", function() {
       ) > -1,
       true
     );
-    assert.strictEqual(Object.keys(inv.manifest).length, 211);  
 
+    expect(Object.keys(inv.manifest)).to.have.members(Object.keys(uniqueFiles_additional));
 
     // Now delete some stuff
     await fs.remove(path.join(sourcePath1_additional_files, "sample", "pics"));
+
     // And re-import
+
     await repository.importNewObjectDir(test_id, sourcePath1_additional_files);
+
 
     // Re-initialize exsiting object
     const inv1 = await object.getInventory();
     //
-    assert.strictEqual(Object.keys(inv1.manifest).length, 211);
+    // the manifest should be the same as it was before the deletion, because
+    // deleting a file doesn't remove it from the manifest
+
+    expect(Object.keys(inv1.manifest)).to.have.members(Object.keys(uniqueFiles_additional));
+
     assert.strictEqual(inv1.manifest[sepiaPicHash][0], sepiaPicPath);
     // Sepia pic is v2
     assert.strictEqual(
@@ -287,10 +303,17 @@ describe("Adding objects from directories", function() {
       path.join(sourcePath1, "sample", "pics"),
       path.join(sourcePath1_additional_files, "sample", "pics")
     );
+
+    // Note that these tests are passing, but bad, because they only work because
+    // we put the same things back
+
+    const uniqueFiles_reup = await fileUtils.collectUniqueFiles(sourcePath1_additional_files);
+
     await repository.importNewObjectDir(test_id, sourcePath1_additional_files);
 
     const inv2 = await object.getInventory();
-    assert.strictEqual(Object.keys(inv1.manifest).length, 211);
+    //assert.strictEqual(Object.keys(inv1.manifest).length, 211);
+    expect(Object.keys(inv2.manifest)).to.have.members(Object.keys(uniqueFiles_reup));
     assert.strictEqual(inv2.manifest[sepiaPicHash][0], sepiaPicPath);
     // Sepia pic is v2
     assert.strictEqual(
