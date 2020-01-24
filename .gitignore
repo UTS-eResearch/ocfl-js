@@ -5,4 +5,15 @@ test-data/exportv1
 test-data/exportv4
 test-data/ocfl-object1
 test-data/ocfl1
+test-data/ocfl2
 test-data/streams
+test-data/additive_export
+test-data/additive_import
+test-data/additive_repo
+test-data/directory_repo
+test-data/ocfl-object
+test-data/ocfl-object1-source_additional_files
+test-data/tree
+test-data/tree1
+test-data/treesRepo
+test-data/
