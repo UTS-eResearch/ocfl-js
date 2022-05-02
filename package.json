@@ -18,6 +18,7 @@
   "dependencies": {
     "chai": "^4.2.0",
     "chai-fs": "^2.0.0",
+    "commander": "^9.2.0",
     "fs-extra": "^7.0.1",
     "hasha": "^3.0.0",
     "lodash": "^4.17.15",
