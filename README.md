@@ -1,3 +1,5 @@
+## Development of this package has moved to: https://github.com/Language-Research-Technology/ocfl-js
+
 # About
 
 This is a pre-alpha nodejs library implement the (emerging) Oxford Common File Layout specification.
